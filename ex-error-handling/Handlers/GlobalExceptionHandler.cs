@@ -11,7 +11,7 @@ namespace ex_error_handling.Handlers
             switch (exception)
             {
                 case MyCustomException e:
-                    await HandleMyCustomException(httpContext, e, cancellationToken);
+                    await e.Handle(httpContext, cancellationToken);
                     break;
                 default:
                     await HandleDefault(httpContext, cancellationToken);
@@ -33,18 +33,6 @@ namespace ex_error_handling.Handlers
             {
                 Status = httpContext.Response.StatusCode,
                 Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.2"
-            }, cancellationToken);
-        }
-
-        private static async Task HandleMyCustomException(HttpContext httpContext, MyCustomException exception, CancellationToken cancellationToken)
-        {
-            httpContext.Response.StatusCode = StatusCodes.Status417ExpectationFailed;
-
-            await httpContext.Response.WriteAsJsonAsync(new ProblemDetails
-            {
-                Status = httpContext.Response.StatusCode,
-                Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.14",
-                Detail = exception.Message
             }, cancellationToken);
         }
     }
